@@ -1,10 +1,11 @@
 import tweepy
 import socket
 import re
+import os
+from dotenv import load_dotenv
 # import preprocessor
 
-
-
+load_dotenv()
 # Enter your Twitter keys here!!!
 ACCESS_TOKEN = 
 ACCESS_SECRET = 
