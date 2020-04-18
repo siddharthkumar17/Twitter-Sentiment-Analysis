@@ -1,9 +1,12 @@
+import findspark
+findspark.init('C:/spark')
+
 from pyspark import SparkConf, SparkContext
 from pyspark.streaming import StreamingContext
-# from geopy.geocoders import Nominatim
+from geopy.geocoders import Nominatim
 # from textblob import TextBlob
 # from elasticsearch import Elasticsearch
-
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
 TCP_IP = 'localhost'

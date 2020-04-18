@@ -7,15 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 # Enter your Twitter keys here!!!
-ACCESS_TOKEN = 
-ACCESS_SECRET = 
-CONSUMER_KEY = 
-CONSUMER_SECRET = 
+ACCESS_TOKEN = os.getenv('ACCESS_TOKEN')
+ACCESS_SECRET = os.getenv('ACCESS_SECRET')
+CONSUMER_KEY = os.getenv('CONSUMER_KEY')
+CONSUMER_SECRET = os.getenv('CONSUMER_SECRET')
 
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-
 
 hashtag = '#covid19'
 
@@ -29,8 +28,9 @@ def preprocessing(tweet):
     
     # Add here your code to preprocess the tweets and  
     # remove Emoji patterns, emoticons, symbols & pictographs, transport & map symbols, flags (iOS), etc
+    
        
-    return tweet
+    return ''.join([i if ord(i) < 128 else ' ' for i in tweet])
 
 
 
@@ -39,7 +39,8 @@ def getTweet(status):
     
     # You can explore fields/data other than location and the tweet itself. 
     # Check what else you could explore in terms of data inside Status object
-
+    print(status)
+    exit(0)
     tweet = ""
     location = ""
 
@@ -62,11 +63,6 @@ def getTweet(status):
 
 
 
-# create sockets
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT))
-s.listen(1)
-conn, addr = s.accept()
 
 class MyStreamListener(tweepy.StreamListener):
 
@@ -76,7 +72,7 @@ class MyStreamListener(tweepy.StreamListener):
         if (location != None and tweet != None):
             tweetLocation = location + "::" + tweet+"\n"
             print(status.text)
-            conn.send(tweetLocation.encode('utf-8'))
+            #conn.send(tweetLocation.encode('utf-8'))
 
         return True
 
@@ -90,4 +86,7 @@ class MyStreamListener(tweepy.StreamListener):
 myStream = tweepy.Stream(auth=auth, listener=MyStreamListener())
 myStream.filter(track=[hashtag], languages=["en"])
 
-
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.bind((TCP_IP, TCP_PORT))
+# s.listen(1)
+# conn, addr = s.accept()
