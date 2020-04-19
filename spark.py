@@ -19,7 +19,8 @@ def sentiment_analysis(tweet):
 
 def es_index(tweet, location):
         es = Elasticsearch()
-        es.index()
+        #index the tweet and the location
+        #es.index()
 
 
 def processTweet(tweet):
