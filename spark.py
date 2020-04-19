@@ -5,7 +5,7 @@ from pyspark import SparkConf, SparkContext
 from pyspark.streaming import StreamingContext
 from geopy.geocoders import Nominatim
 # from textblob import TextBlob
-# from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
@@ -16,6 +16,10 @@ def sentiment_analysis(tweet):
 
         analyzer = SentimentIntensityAnalyzer()
         return analyzer.polarity_scores(tweet)
+
+def es_index(tweet, location):
+        es = Elasticsearch()
+        es.index()
 
 
 def processTweet(tweet):
