@@ -24,12 +24,6 @@ def es_index(tweet, location):
 
 def processTweet(tweet):
 
-    # Here, you should implement:
-    # (i) Sentiment analysis,
-    # (ii) Get data corresponding to place where the tweet was generate (using geopy or googlemaps)
-    # (iii) Index the data using Elastic Search 
-
-
     tweetData = tweet.split("::")
 
     if len(tweetData) > 1:
