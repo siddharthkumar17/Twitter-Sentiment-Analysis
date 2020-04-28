@@ -17,7 +17,7 @@ def sentiment_analysis(tweet):
         analyzer = SentimentIntensityAnalyzer()
         return analyzer.polarity_scores(tweet)
 
-def es_index(tweet, location):
+def es_index(sentiment, location):
         es = Elasticsearch()
         #index the tweet and the location
         #es.index()
@@ -32,7 +32,7 @@ def processTweet(tweet):
         text = tweetData[1]
         rawLocation = tweetData[0]
 
-        sentiment_analysis(text)
+        sentiment_scores = sentiment_analysis(text)
 
         # (i) Apply Sentiment analysis in "text"
 
@@ -52,7 +52,8 @@ def processTweet(tweet):
 
 
 
-        # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!)      
+        # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!) 
+        es_index(sentiment_scores, location)     
         
 
 
