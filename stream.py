@@ -27,8 +27,7 @@ TCP_PORT = 9001
 def preprocessing(tweet):
     
     # Add here your code to preprocess the tweets and  
-    # remove Emoji patterns, emoticons, symbols & pictographs, transport & map symbols, flags (iOS), etc
-    
+    # remove Emoji patterns, emoticons, symbols & pictographs, transport & map symbols, flags (iOS), etc  
        
     ntweet = ''.join([i if ord(i) < 128 else '' for i in tweet])
     return ntweet
@@ -57,9 +56,9 @@ def getTweet(status):
             tweet = status.extended_tweet["full_text"]
         except AttributeError:
             tweet = status.text
-
-    return location, preprocessing(tweet)
-
+    tweet = preprocessing(tweet)
+    #print(tweet)
+    return location, tweet
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))

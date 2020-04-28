@@ -13,7 +13,7 @@ TCP_IP = 'localhost'
 TCP_PORT = 9001
 
 def sentiment_analysis(tweet):
-
+        # [pos: .xxx, neg: .xxx, neu:. xxx]
         analyzer = SentimentIntensityAnalyzer()
         return analyzer.polarity_scores(tweet)
 
@@ -53,7 +53,10 @@ def processTweet(tweet):
 
 
         # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!) 
-        es_index(sentiment_scores, location)     
+        #es_index(sentiment_scores, location)'
+        v = {location: sentiment_scores}
+        print(v)
+        return v    
         
 
 
@@ -63,7 +66,7 @@ def processTweet(tweet):
 conf = SparkConf()
 conf.setAppName('TwitterApp')
 conf.setMaster('local[2]')
-
+conf.set("es.index.auto.create", "true")
 # create spark context with the above configuration
 sc = SparkContext(conf=conf)
 sc.setLogLevel("OFF")
