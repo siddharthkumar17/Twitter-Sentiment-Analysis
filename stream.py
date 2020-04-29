@@ -30,7 +30,7 @@ def preprocessing(tweet):
     # remove Emoji patterns, emoticons, symbols & pictographs, transport & map symbols, flags (iOS), etc  
        
    
-    return tweet.encode("ascii", "ignore")
+    return tweet.encode("ascii", "ignore").decode()
 
 
 

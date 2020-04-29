@@ -1,13 +1,4 @@
 import os
-# os.environ['PYSPARK_SUBMIT_ARGS'] = '--jars ./elasticsearch-hadoop-6.1.1/dist/elasticsearch-spark-20_2.11-7.6.2.jar pyspark-shell'
-# es_write_conf = {
-# "es.nodes" : 'localhost',
-# "es.port" : '9200',
-# "es.resource" : 'spark/twitter_project',
-# "es.input.json" : "yes",
-# "es.mapping.id": "doc_id"
-
-# }
 import findspark
 findspark.init('C:/spark')
 
@@ -29,8 +20,8 @@ def sentiment_analysis(tweet):
 
 def es_index(doc):
         es = Elasticsearch()
-        es.indices.create(index='spark/twitter_project', ignore=400)
-        res = es.index('spark/twitter_project', id=doc['_id'], body=doc)
+        es.indices.create(index='twitter_project', ignore=400)
+        res = es.index('twitter_project', id=doc['id'], body=doc)
         #index the tweet and the location
         #es.index()
         print(res)     
@@ -53,9 +44,9 @@ def processTweet(tweet):
 	# (ii) Get geolocation (state, country, lat, lon, etc...) from rawLocation
         geolocator = Nominatim(user_agent="twitter sentiment analysis")
         location = geolocator.geocode(rawLocation)
-        print("\n\n=========================\ntweet: ", tweet)
-        print("Raw location from tweet status: ", rawLocation)
-        print("GeoPy location: ", location)
+        # print("\n\n=========================\ntweet: ", tweet)
+        # print("Raw location from tweet status: ", rawLocation)
+        # print("GeoPy location: ", location)
         
         # print("lat: ", lat)
         # print("lon: ", lon)
@@ -63,14 +54,18 @@ def processTweet(tweet):
         # print("country: ", country)
         # print("Text: ", text)
         # print("Sentiment: ", sentiment)
-
-
-
         # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!) 
         #es_index(sentiment_scores, location)'
-        text_hash = abs(int(hashlib.sha256(text.encode('utf-8')).hexdigest()[:8], 16))
-        v = {'_id': text_hash, 'text': text, 'location': location, 'sentiment': sentiment_scores}
-        print(v)
+        v={}
+        try:
+                text_hash = abs(int(hashlib.sha256(text.encode('utf-8')).hexdigest()[:8], 16))
+                v = {'id': text_hash, 'text': text, 'latitude': location.latitude, 'longitude': location.longitude, 
+                        'sentiment': sentiment_scores, 'positive_sentiment': sentiment_scores['pos'], 'negative_sentiment': sentiment_scores['neg'], 'neutral_sentiment': sentiment_scores['neu']}
+                print(v)
+                es_index(v)
+        except Exception as e:
+                print(str(e))
+        
         #return v    
         
 
