@@ -29,8 +29,8 @@ def preprocessing(tweet):
     # Add here your code to preprocess the tweets and  
     # remove Emoji patterns, emoticons, symbols & pictographs, transport & map symbols, flags (iOS), etc  
        
-    ntweet = ''.join([i if ord(i) < 128 else '' for i in tweet])
-    return ntweet
+   
+    return tweet.encode("ascii", "ignore").decode()
 
 
 
