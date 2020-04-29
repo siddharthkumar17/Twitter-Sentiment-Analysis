@@ -1,3 +1,13 @@
+import os
+# os.environ['PYSPARK_SUBMIT_ARGS'] = '--jars ./elasticsearch-hadoop-6.1.1/dist/elasticsearch-spark-20_2.11-7.6.2.jar pyspark-shell'
+# es_write_conf = {
+# "es.nodes" : 'localhost',
+# "es.port" : '9200',
+# "es.resource" : 'spark/twitter_project',
+# "es.input.json" : "yes",
+# "es.mapping.id": "doc_id"
+
+# }
 import findspark
 findspark.init('C:/spark')
 
@@ -7,7 +17,7 @@ from geopy.geocoders import Nominatim
 # from textblob import TextBlob
 from elasticsearch import Elasticsearch
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
+import hashlib
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
@@ -17,10 +27,14 @@ def sentiment_analysis(tweet):
         analyzer = SentimentIntensityAnalyzer()
         return analyzer.polarity_scores(tweet)
 
-def es_index(sentiment, location):
+def es_index(doc):
         es = Elasticsearch()
+        es.indices.create(index='spark/twitter_project', ignore=400)
+        res = es.index('spark/twitter_project', id=doc['_id'], body=doc)
         #index the tweet and the location
         #es.index()
+        print(res)     
+
 
 
 def processTweet(tweet):
@@ -54,9 +68,10 @@ def processTweet(tweet):
 
         # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!) 
         #es_index(sentiment_scores, location)'
-        v = {location: sentiment_scores}
+        text_hash = abs(int(hashlib.sha256(text).hexdigest()[:8], 16))
+        v = {'_id': text_hash, 'text': text, 'location': location, 'sentiment': sentiment_scores}
         print(v)
-        return v    
+        #return v    
         
 
 
@@ -66,7 +81,6 @@ def processTweet(tweet):
 conf = SparkConf()
 conf.setAppName('TwitterApp')
 conf.setMaster('local[2]')
-conf.set("es.index.auto.create", "true")
 # create spark context with the above configuration
 sc = SparkContext(conf=conf)
 sc.setLogLevel("OFF")
@@ -78,7 +92,7 @@ ssc.checkpoint("checkpoint_TwitterApp")
 dataStream = ssc.socketTextStream(TCP_IP, TCP_PORT)
 
 
-dataStream.foreachRDD(lambda rdd: rdd.foreach(processTweet))
+dataStream.foreachRDD(lambda rdd: rdd.foreach(processTweet))#.foreachRDD(lambda rdd: rdd.saveAsNewAPIHadoopFile(path='-',outputFormatClass="org.elasticsearch.hadoop.mr.EsOutputFormat",keyClass="org.apache.hadoop.io.NullWritable",valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable",conf=es_write_conf))
 
 
 ssc.start()
