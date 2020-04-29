@@ -68,7 +68,7 @@ def processTweet(tweet):
 
         # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!) 
         #es_index(sentiment_scores, location)'
-        text_hash = abs(int(hashlib.sha256(text).hexdigest()[:8], 16))
+        text_hash = abs(int(hashlib.sha256(text.encode('utf-8')).hexdigest()[:8], 16))
         v = {'_id': text_hash, 'text': text, 'location': location, 'sentiment': sentiment_scores}
         print(v)
         #return v    
@@ -92,7 +92,8 @@ ssc.checkpoint("checkpoint_TwitterApp")
 dataStream = ssc.socketTextStream(TCP_IP, TCP_PORT)
 
 
-dataStream.foreachRDD(lambda rdd: rdd.foreach(processTweet))#.foreachRDD(lambda rdd: rdd.saveAsNewAPIHadoopFile(path='-',outputFormatClass="org.elasticsearch.hadoop.mr.EsOutputFormat",keyClass="org.apache.hadoop.io.NullWritable",valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable",conf=es_write_conf))
+dataStream.foreachRDD(lambda rdd: rdd.foreach(processTweet))
+#.foreachRDD(lambda rdd: rdd.saveAsNewAPIHadoopFile(path='-',outputFormatClass="org.elasticsearch.hadoop.mr.EsOutputFormat",keyClass="org.apache.hadoop.io.NullWritable",valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable",conf=es_write_conf))
 
 
 ssc.start()
