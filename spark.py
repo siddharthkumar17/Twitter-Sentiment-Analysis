@@ -1,6 +1,6 @@
 import os
 import findspark
-findspark.init('C:/spark')
+findspark.init('/home/cole/spark')
 
 from pyspark import SparkConf, SparkContext
 from pyspark.streaming import StreamingContext
@@ -20,7 +20,18 @@ def sentiment_analysis(tweet):
 
 def es_index(doc):
         es = Elasticsearch()
-        es.indices.create(index='twitter_project', ignore=400)
+        es.indices.create(index='twitter_project', ignore=400, body={
+            "mappings": 
+            {
+                "properties": 
+                {
+                    "location": 
+                    {
+                        "type": "geo_point"
+                    }
+                }
+            }
+        })
         res = es.index('twitter_project', id=doc['id'], body=doc)
         #index the tweet and the location
         #es.index()
@@ -59,8 +70,8 @@ def processTweet(tweet):
         v={}
         try:
                 text_hash = abs(int(hashlib.sha256(text.encode('utf-8')).hexdigest()[:8], 16))
-                v = {'id': text_hash, 'text': text, 'latitude': location.latitude, 'longitude': location.longitude, 
-                        'sentiment': sentiment_scores, 'positive_sentiment': sentiment_scores['pos'], 'negative_sentiment': sentiment_scores['neg'], 'neutral_sentiment': sentiment_scores['neu']}
+                v = {'id': text_hash, 'text': text, "location": {'lat': location.latitude, 'lon': location.longitude}, 
+                    'positive_sentiment': sentiment_scores['pos'], 'negative_sentiment': sentiment_scores['neg'], 'neutral_sentiment': sentiment_scores['neu']}
                 print(v)
                 es_index(v)
         except Exception as e:
