@@ -74,7 +74,7 @@ class MyStreamListener(tweepy.StreamListener):
 
         if (location != None and tweet != None):
             tweetLocation = location + "::" + tweet+"\n"
-            print(status.text)
+           # print(status.text)
             conn.send(tweetLocation.encode('utf-8'))
 
         return True

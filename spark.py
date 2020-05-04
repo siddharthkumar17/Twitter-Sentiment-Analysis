@@ -1,6 +1,6 @@
 import os
 import findspark
-findspark.init('/home/cole/spark')
+findspark.init('C:/spark')
 
 from pyspark import SparkConf, SparkContext
 from pyspark.streaming import StreamingContext
@@ -34,7 +34,7 @@ def es_index(doc):
         })
         res = es.index('twitter_project', id=doc['id'], body=doc)
         #index the tweet and the location
-        #es.index()
+        
         print(res)     
 
 
@@ -55,18 +55,7 @@ def processTweet(tweet):
 	# (ii) Get geolocation (state, country, lat, lon, etc...) from rawLocation
         geolocator = Nominatim(user_agent="twitter sentiment analysis")
         location = geolocator.geocode(rawLocation)
-        # print("\n\n=========================\ntweet: ", tweet)
-        # print("Raw location from tweet status: ", rawLocation)
-        # print("GeoPy location: ", location)
-        
-        # print("lat: ", lat)
-        # print("lon: ", lon)
-        # print("state: ", state)
-        # print("country: ", country)
-        # print("Text: ", text)
-        # print("Sentiment: ", sentiment)
-        # (iii) Post the index on ElasticSearch or log your data in some other way (you are always free!!) 
-        #es_index(sentiment_scores, location)'
+
         v={}
         try:
                 text_hash = abs(int(hashlib.sha256(text.encode('utf-8')).hexdigest()[:8], 16))
@@ -99,8 +88,6 @@ dataStream = ssc.socketTextStream(TCP_IP, TCP_PORT)
 
 
 dataStream.foreachRDD(lambda rdd: rdd.foreach(processTweet))
-#.foreachRDD(lambda rdd: rdd.saveAsNewAPIHadoopFile(path='-',outputFormatClass="org.elasticsearch.hadoop.mr.EsOutputFormat",keyClass="org.apache.hadoop.io.NullWritable",valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable",conf=es_write_conf))
-
 
 ssc.start()
 ssc.awaitTermination()
